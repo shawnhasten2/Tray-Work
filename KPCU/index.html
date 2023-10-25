@@ -58,50 +58,6 @@
             </div>
             <form v-else @submit.prevent="submitForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <div class="mb-4">
-                    <label for="contactUniqueId" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.unique_id.required">*</i> {{currentDescriptions("unique_id", "label")}}:</label>
-                    <input type="text" id="contactUniqueId" v-model="contactUniqueId" @input="lookupContact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    <!-- Add a container for the SVG icons -->
-                    <div v-if="isSearching == true" class="flex flex-row-reverse items-center pr-3 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" height="1em" width="1em" stroke="currentColor" class="load-svg w-6 h-6 animate-spin"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
-                    </div>
-                    <!-- Display the success or failure SVG icon based on the search result -->
-                    <div v-else-if="searchResult === 'success'" class="flex flex-row-reverse items-center pr-3 pointer-events-none">
-                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="success-svg jss456" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
-                    </div>
-                    <div v-else-if="searchResult === 'fail'" class="flex flex-row-reverse items-center pr-3 pointer-events-none">
-                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="fail-svg jss457" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31A7.902 7.902 0 0112 20zm6.31-3.1L7.1 5.69A7.902 7.902 0 0112 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"></path></svg>
-                    </div>
-                    <p><small class="text-red-700" v-if="!validUniqueId">Please enter a valid unique_id!</small></p>
-                    <p><small><i>{{currentDescriptions("unique_id", "description")}}</i></small></p>
-                </div>
-                <div v-if="searchResult === 'fail' && validUniqueId" class="mb-4">
-                    <label for="verifyUniqueId" class="block text-gray-700 text-sm font-bold mb-2">Verify {{currentDescriptions("unique_id", "label")}}:</label>
-                    <input
-                        type="text"
-                        id="verifyUniqueId"
-                        v-model="verifyUniqueId"
-                        :class="{ 'border-danger': verifyUniqueId !== contactUniqueId, 'border-success': verifyUniqueId === contactUniqueId }"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    >
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.email.required">*</i> {{currentDescriptions("email", "label")}}:</label>
-                    <input type="text" id="email" v-model="email" :disabled="searchResult === 'success'" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="mb-4">
-                    <label for="phoneMobile" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.phone_mobile.required">*</i> {{currentDescriptions("phone_mobile", "label")}}:</label>
-                    <input type="text" id="phoneMobile" :disabled="searchResult === 'success'" v-model="phoneMobile" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="mb-4">
-                    <label for="firstName" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.first_name.required">*</i> {{currentDescriptions("first_name", "label")}}:</label>
-                    <input type="text" id="firstName" :disabled="searchResult === 'success'" v-model="firstName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="mb-4">
-                    <label for="lastName" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.last_name.required">*</i> {{currentDescriptions("last_name", "label")}}:</label>
-                    <input type="text" id="lastName" :disabled="searchResult === 'success'" v-model="lastName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <!-- Existing code for the "Account Number" input -->
-                <div class="mb-4">
                     <label for="accountNumber" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.account_number.required">*</i> {{currentDescriptions("account_number", "label")}}:</label>
                     <input type="text" id="accountNumber" v-model="accountNumber" @input="lookupAccount" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     <!-- Add a container for the SVG icons -->
@@ -129,22 +85,7 @@
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     >
                 </div>
-                <div class="mb-4">
-                    <label for="productCodes" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.product_code.required">*</i> {{currentDescriptions("product_code", "label")}}:</label>
-                    <select id="productCodes" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="productChange($event)">
-                        <option value="" disabled selected>-- Select {{currentDescriptions("product_code", "label")}} --</option>
-                        <option v-for="code in productCodes" :value="code.value">{{ code.label }}</option>
-                        <!-- Add more options as needed -->
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="campaigns" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.campaign.required">*</i> {{currentDescriptions("campaign", "label")}}:</label>
-                    <select id="campaigns" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="campaignsChange($event)">
-                        <option value="" disabled selected>-- Select {{currentDescriptions("campaign", "label")}} --</option>
-                        <option v-for="c in campaigns" :value="c.value">{{ c.label }}</option>
-                        <!-- Add more options as needed -->
-                    </select>
-                </div>
+                
                 <div class="mb-4">
                     <label for="objectives" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.objective.required">*</i> {{currentDescriptions("objective", "label")}}:</label>
                     <select id="objectives" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="objectivesChange($event)">
@@ -159,10 +100,34 @@
                     <label for="micr" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="descriptions.micr.required">*</i> {{currentDescriptions("micr", "label")}}:</label>
                     <input type="text" id="micr" v-model="micr" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
+                
+                <!---->
+                <span v-for="field in descriptions">
+                    <div class="mb-4">
+                        <label :for="field.key" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="field.required">*</i> {{currentDescriptions(field.label, "", true)}}:</label>
+                        <input v-if="field.type === 'checkbox'" type="checkbox" :id="field.key" :name="field.key" @click="fieldUpdate(field.key, 'checkbox')" :checked="field.value">
+                        
+                        <select v-else-if="field.type === 'select'" :id="field.key" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="fieldUpdate(field.key)">
+                            <option value="" disabled selected>-- Select {{currentDescriptions("objective", "label")}} --</option>
+                            <option v-for="o in field.options" :value="o.value">{{ o.label }}</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                        
+                        <input v-else :type="field.type" :id="field.key" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="fieldUpdate(field.key)" @keyup="fieldUpdate(field.key)">
+                    </div>
+
+                    <!-- New input and button for account verification -->
+                    <div v-if="field.verify && field.verifyShow" class="mb-4">
+                        <label :for="'verify_'+field.key" class="block text-gray-700 text-sm font-bold mb-2">Verify {{currentDescriptions(field.label, "", true)}}:</label>
+                        <input :type="field.type" :id="'verify_'+field.key" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="fieldUpdate(key=field.key, value='verifyValue')" @keyup="fieldUpdate(key=field.key, value='verifyValue')">
+                    </div>
+                </span>
+                <!---->
+                
                 <div v-for="field in otherFields" class="mb-4">
                     <label :for="field.key" class="block text-gray-700 text-sm font-bold mb-2"><i class="text-red-700" v-if="field.required">*</i> {{currentDescriptions(field.label, "", true)}}:</label>
-                    <input v-if="field.type === 'checkbox'" type="checkbox" :id="field.key" :name="field.key" @click="otherFieldUpdate(field.key, 'checkbox')" :checked="field.value">
-                    <input v-else :type="field.type" :id="field.key" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="otherFieldUpdate(field.key)" @keyup="otherFieldUpdate(field.key)">
+                    <input v-if="field.type === 'checkbox'" type="checkbox" :id="field.key" :name="field.key" @click="fieldUpdate(field.key, 'checkbox', true)" :checked="field.value">
+                    <input v-else :type="field.type" :id="field.key" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" @change="fieldUpdate(field.key, '', true)" @keyup="fieldUpdate(field.key, '', true)">
                 </div>
                 <!-- Repeat the above structure for other input fields -->
 
@@ -175,7 +140,26 @@
 
     <!-- Include Vue.js (use your own path) -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script></script>
-    <script>            
+    <script>
+    
+        var productCodes = [
+            {
+                "label":"Checking",
+                "value":"ABCDE"
+            }
+        ];
+        var campaigns = [
+            {
+                "label":"Account Test",
+                "value":"c3f6e6d3-e922-419e-a682-b7ec903fb256"
+            }
+        ];
+        var objectives = [
+            {
+                "label":"Santa Clara Branch",
+                "value":"24141077-09a8-4320-85ea-222a85e2b12f"
+            }
+        ];         
         new Vue({
             el: '#app',
             data: {
@@ -196,25 +180,25 @@
                 accountSearchResult: null, // Store the account search result (success/failure)
                 verifyAccountNumber: '', // Field for verifying the account number
                 productCodes: [
-   {
-      "label":"Checking",
-      "value":"ABCDE"
-   }
-],
+                    {
+                        "label":"Checking",
+                        "value":"ABCDE"
+                    }
+                ],
                 productCode:'',
                 campaigns: [
-   {
-      "label":"Account Test",
-      "value":"c3f6e6d3-e922-419e-a682-b7ec903fb256"
-   }
-],
+                    {
+                        "label":"Account Test",
+                        "value":"c3f6e6d3-e922-419e-a682-b7ec903fb256"
+                    }
+                ],
                 campaign:'',
                 objectives:[
-   {
-      "label":"Santa Clara Branch",
-      "value":"24141077-09a8-4320-85ea-222a85e2b12f"
-   }
-],
+                    {
+                        "label":"Santa Clara Branch",
+                        "value":"24141077-09a8-4320-85ea-222a85e2b12f"
+                    }
+                ],
                 objective:'',
                 micr: '',
                 contactId:'',
@@ -223,119 +207,182 @@
                 journey_link:null,
                 showLoading:false,
                 descriptions:{
-   "unique_id":{
-      "label":{
-         "en":"Contact Unique ID",
-         "es":"Identificación única de contacto"
-      },
-      "description":{
-         "en":"P + Member Number",
-         "es":"P + Número de miembro"
-      },
-      "required":true,
-      "pattern":"^P\\d+$"
-   },
-   "email":{
-      "label":{
-         "en":"Email",
-         "es":"Email"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":true
-   },
-   "phone_mobile":{
-      "label":{
-         "en":"Phone Mobile",
-         "es":"Teléfono móvil"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":true
-   },
-   "first_name":{
-      "label":{
-         "en":"First Name",
-         "es":"Nombre De Pila"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":true
-   },
-   "last_name":{
-      "label":{
-         "en":"Last Name",
-         "es":"Apellido"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":true
-   },
-   "account_number":{
-      "label":{
-         "en":"Account Number",
-         "es":"Número de cuenta"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":false
-   },
-   "product_code":{
-      "label":{
-         "en":"Product Code",
-         "es":"Código de producto"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":false
-   },
-   "campaign":{
-      "label":{
-         "en":"Campaign",
-         "es":"Campaña"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":true
-   },
-   "objective":{
-      "label":{
-         "en":"Objective",
-         "es":"Objetivo"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":true
-   },
-   "micr":{
-      "label":{
-         "en":"MICR",
-         "es":"MICR"
-      },
-      "description":{
-         "en":"",
-         "es":""
-      },
-      "required":false,
-      "visible":false
-   }
-},
+                    "unique_id":{
+                        "label":{
+                            "en":"Contact Unique ID",
+                            "es":"Identificación única de contacto"
+                        },
+                        "description":{
+                            "en":"P + Member Number",
+                            "es":"P + Número de miembro"
+                        },
+                        "required":true,
+                        "pattern":"^P\\d+$",
+                        "verify":true,
+                        "visible":true,
+                        "entity":"contact",
+                        "type":"text",
+                        "value":"",
+                        "verifyValue":"",
+                        "verifyShow":false
+                    },
+                    "email":{
+                        "label":{
+                            "en":"Email",
+                            "es":"Email"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":true,
+                        "pattern":"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+                        "verify":false,
+                        "visible":true,
+                        "entity":"contact",
+                        "type":"text",
+                        "value":""
+                    },
+                    "phone_mobile":{
+                        "label":{
+                            "en":"Phone Mobile",
+                            "es":"Teléfono móvil"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":true,
+                        "pattern":null,
+                        "verify":false,
+                        "visible":true,
+                        "entity":"contact",
+                        "type":"text",
+                        "value":""
+                    },
+                    "first_name":{
+                        "label":{
+                            "en":"First Name",
+                            "es":"Nombre De Pila"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":true,
+                        "pattern":null,
+                        "verify":false,
+                        "visible":true,
+                        "entity":"contact",
+                        "type":"text",
+                        "value":""
+                    },
+                    "last_name":{
+                        "label":{
+                            "en":"Last Name",
+                            "es":"Apellido"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":true,
+                        "pattern":null,
+                        "verify":false,
+                        "visible":true,
+                        "entity":"contact",
+                        "type":"text",
+                        "value":""
+                    },
+                    "account_number":{
+                        "label":{
+                            "en":"Account Number",
+                            "es":"Número de cuenta"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":true,
+                        "pattern":null,
+                        "verify":true,
+                        "visible":true,
+                        "entity":"account",
+                        "type":"text",
+                        "value":""
+                    },
+                    "product_code":{
+                        "label":{
+                            "en":"Product Code",
+                            "es":"Código de producto"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":false,
+                        "pattern":null,
+                        "verify":false,
+                        "visible":true,
+                        "entity":"account",
+                        "type":"select",
+                        "options":productCodes,
+                        "value":""
+                    },
+                    "campaign":{
+                        "label":{
+                            "en":"Campaign",
+                            "es":"Campaña"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":true,
+                        "pattern":null,
+                        "verify":false,
+                        "visible":true,
+                        "entity":"campaign",
+                        "type":"select",
+                        "options":campaigns,
+                        "value":""
+                    },
+                    "objective":{
+                        "label":{
+                            "en":"Objective",
+                            "es":"Objetivo"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":true,
+                        "pattern":null,
+                        "verify":false,
+                        "visible":true,
+                        "entity":"objective",
+                        "type":"select",
+                        "options":objectives,
+                        "value":""
+                    },
+                    "micr":{
+                        "label":{
+                            "en":"MICR",
+                            "es":"MICR"
+                        },
+                        "description":{
+                            "en":"",
+                            "es":""
+                        },
+                        "required":false,
+                        "pattern":null,
+                        "verify":false,
+                        "visible":false,
+                        "entity":"account",
+                        "type":"text",
+                        "value":""
+                    }
+                },
                 otherFields:{
                     "spanish_speaker":{
                         "key":"spanish_speaker",
@@ -690,7 +737,7 @@
                 formatRedirect(){
                     return '/?lang='+this.selectedLanguage;
                 },
-                otherFieldUpdate(key, type='other'){
+                fieldUpdate(key, type='other', other=false, value="value"){
                     var value = '';
                     if(type == 'checkbox'){
                         value = document.getElementById(key).checked;
@@ -698,7 +745,15 @@
                     else{
                         value = document.getElementById(key).value;
                     }
-                    this.otherFields[key]['value'] = value;
+                    if(other){
+                        this.otherFields[key][value] = value;
+                    }
+                    else{
+                        this.descriptions[key][value] = value;
+                    }
+                },
+                fieldVerify(){
+                    
                 }
             },
         });
