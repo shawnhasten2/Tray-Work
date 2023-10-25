@@ -1,0 +1,102 @@
+def executeScript(input):
+    results = []
+    for data in input["data"]:
+        result = {}
+        for column_map in input["mapping"]:
+            column = column_map["column"]
+            desired_column = column_map["desired_column"]
+            action = column_map["action"]
+
+            if column in data:
+                value = data[column]
+            else:
+                value = None
+
+            if action == "value_mapping":
+                value_mapping = column_map["value_mapping"]
+                fallback_value = column_map["fallback_value"]
+
+                # Find the replacement based on a match in the list of dictionaries
+                for mapping in value_mapping:
+                    if mapping["value"] == value:
+                        value = mapping["replacement"]
+                        break
+                else:
+                    value = fallback_value
+            elif action == "concatenate_columns":
+                concatenate_order = column_map["concatenate_order"]
+                value = ""
+                for order_item in concatenate_order:
+                    if order_item["type"] == "column":
+                        if order_item["columnOrString"] in data:
+                            value += str(data[order_item["columnOrString"]])
+                    elif order_item["type"] == "string":
+                        value += order_item["columnOrString"]
+            elif action == "replace_characters":
+                substring_mapping = column_map["substring_mapping"]
+                for mapping in substring_mapping:
+                    value = value.replace(mapping["substring"], mapping["replacement"])
+                    
+            if column_map.get("required", False) and value is None:
+                break
+
+            result[desired_column] = value
+    
+        required_columns = [column_map for column_map in input["mapping"] if column_map.get("required")]
+
+        #  Check if all required columns have non-None values in the result dictionary
+        all_required_columns_have_values = True
+        for column_map in required_columns:
+            desired_column = column_map["desired_column"]
+            if result.get(desired_column) is None or result.get(desired_column) == '':
+                all_required_columns_have_values = False
+                break
+
+        if all_required_columns_have_values:
+            results.append(result)
+
+    return results
+
+# Example dictionary and mapping in the new format
+input_data = {
+    "data": [
+				{
+					"MemberNumber": "12345679",
+					"ACTION": ""
+				},
+				{
+					"MemberNumber": "",
+					"ACTION": "LOGIN"
+				}
+			],
+    "mapping": [
+        {
+            "column": "ACTION",
+            "desired_column": "online-banking",
+            "action": "value_mapping",
+            "required": True,
+            "value_mapping": [
+                {
+                    "value": "LOGIN",
+                    "replacement": "True"
+                }
+            ],
+            "fallback_value": "False",
+            "substring_mapping": [],
+            "concatenate_order": []
+        },
+        {
+            "column": "MemberNumber",
+            "desired_column": "unique_id",
+            "action": "no_action",
+            "required": True,
+            "value_mapping": [],
+            "fallback_value": "",
+            "substring_mapping": [],
+            "concatenate_order": []
+        }
+    ]
+}
+
+# Map columns
+print(executeScript(input_data))

@@ -1,0 +1,13 @@
+config.py
+.DS_Store
+test.html
+tray_auth.py
+tray_solution.py
+__pycache__/config.cpython-39.pyc
+COFCU/cofcu-cc.json
+COFCU/cofcu-mappings.csv
+COFCU/example-data.csv
+COFCU/example.json
+COFCU/getSettings.py
+COFCU/sftp_test.py
+COFCU/update_project.py

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Mapping Builder</title>
+    <!-- Include Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="app" class="container mx-auto py-10">
+        <form @submit.prevent="addMapping" class="bg-white p-4 rounded shadow-md mb-4">
+            <div class="mb-4">
+                <label for="sourceColumn" class="block text-gray-700 font-bold mb-2">Source Column:</label>
+                <input type="text" id="sourceColumn" v-model="newMapping.column" class="form-input border w-full p-2">
+            </div>
+            <div class="mb-4">
+                <label for="desiredColumn" class="block text-gray-700 font-bold mb-2">Desired Column:</label>
+                <input type="text" id="desiredColumn" v-model="newMapping.desired_column" class="form-input border w-full p-2">
+            </div>
+            <div class="mb-4">
+                <label for="action" class="block text-gray-700 font-bold mb-2">Action:</label>
+                <select id="action" v-model="newMapping.action" class="form-select border w-full p-2">
+                    <option value="no_action">No Action</option>
+                    <option value="value_mapping">Value Mapping</option>
+                    <option value="replace_characters">Replace Characters</option>
+                    <option value="concatenate_columns">Concatenate Columns</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">
+                    <input type="checkbox" id="required" v-model="newMapping.required" class="form-checkbox">
+                    Required
+                </label>
+            </div>
+
+            <!-- Value Mapping -->
+            <div v-if="newMapping.action === 'value_mapping'">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2">Value Mappings:</label>
+                    <button @click.prevent="addValueMapping" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Add Mapping</button>
+                </div>
+                <div class="border p-4 mb-4 rounded">
+                    <div v-for="(valueMapping, index) in newMapping.value_mapping" :key="index" class="mb-4 flex items-center">
+                        <div class="w-1/2 p-4">
+                            <label class="block text-gray-700 font-bold mb-2">CSV Value</label>
+                            <input type="text" class="form-input mr-4 w-full border p-2" v-model="valueMapping.value" placeholder="Value">
+                        </div>
+                        <div class="w-1/2 p-4">
+                            <label class="block text-gray-700 font-bold mb-2">Desired Value</label>
+                            <input type="text" class="form-input mr-4 w-full border p-2" v-model="valueMapping.replacement" placeholder="Replacement">
+                        </div>
+                        <button @click.prevent="removeValueMapping(index)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Remove</button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="fallbackValue" class="block text-gray-700 font-bold mb-2">Fallback Value:</label>
+                    <input type="text" id="fallbackValue" v-model="newMapping.fallback_value" class="form-input border w-full p-2">
+                </div>
+            </div>
+
+            <!-- Replace Characters -->
+            <div v-if="newMapping.action === 'replace_characters'">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2">Substring Mappings:</label>
+                    <button @click.prevent="addSubstringMapping" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Add Mapping</button>
+                </div>
+                <div class="border p-4 mb-4 rounded">
+                    <div v-for="(substringMapping, index) in newMapping.substring_mapping" :key="index" class="mb-4 flex items-center">
+                        <div class="w-1/2 p-4">
+                            <label class="block text-gray-700 font-bold mb-2">Value to Replace</label>
+                            <input type="text" class="form-input mr-4 w-full border p-2" v-model="substringMapping.substring" placeholder="Substring">
+                        </div>
+                        <div class="w-1/2 p-4">
+                            <label class="block text-gray-700 font-bold mb-2">Replace Value</label>
+                            <input type="text" class="form-input mr-4 w-full border p-2" v-model="substringMapping.replacement" placeholder="Replacement">
+                        </div>
+                        <button @click.prevent="removeSubstringMapping(index)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Remove</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Concatenate Columns -->
+            <div v-if="newMapping.action === 'concatenate_columns'">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2">Concatenate Order:</label>
+                    <button @click.prevent="addConcatenateColumn" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Add Column/String</button>
+                </div>
+                <div class="border p-4 mb-4 rounded">
+                    <div v-for="(concatenateInfo, index) in newMapping.concatenate_order" :key="index" class="mb-4 flex items-center w-full">
+                        <div class="w-1/2 p-4">
+                            <label class="block text-gray-700 font-bold mb-2">Type of Replacement</label>
+                            <select class="form-select w-full border p-2" v-model="concatenateInfo.type">
+                                <option value="column">Column</option>
+                                <option value="string">String</option>
+                            </select>
+                        </div>
+                        <div class="w-1/2 p-4">
+                            <label class="block text-gray-700 font-bold mb-2">Value</label>
+                            <input type="text" class="form-input mr-4 w-full border p-2" v-model="concatenateInfo.columnOrString" placeholder="Column Name">
+                        </div>
+                        <button @click.prevent="removeConcatenateColumn(index)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Remove</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <button type="button" @click="cancelEdit" class="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">Cancel</button>
+                <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 ml-2">{{ editingIndex === -1 ? 'Add Mapping' : 'Update Mapping' }}</button>
+            </div>
+        </form>
+
+        <table class="table-auto w-full border-collapse bg-white p-4 rounded shadow-md mb-4">
+            <thead class="bg-gray-200 text-left">
+                <tr>
+                    <th class="px-4 py-4">Source Column</th>
+                    <th class="px-4 py-4">Desired Column</th>
+                    <th class="px-4 py-4">Action</th>
+                    <th class="px-4 py-4">Required</th>
+                    <th class="px-4 py-4">Action Details</th>
+                    <th class="px-4 py-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(mapping, index) in dataMappings" :key="index" class="border-b border-gray-300">
+                    <td class="px-4 py-4">{{ mapping.column }}</td>
+                    <td class="px-4 py-4">{{ mapping.desired_column }}</td>
+                    <td class="px-4 py-4">{{ mapping.action }}</td>
+                    <td class="px-4 py-4">{{ mapping.required ? 'Yes' : 'No' }}</td>
+                    <td class="px-4 py-4">{{ mappingDetails(mapping) }}</td>
+                    <td class="px-4 py-4">
+                        <button @click="editMapping(index)" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Edit</button>
+                        <button @click="removeMapping(index)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mt-4">
+            <button @click="saveMappings" class="bg-indigo-500 text-white px-4 py-4 rounded hover:bg-indigo-600">Save Mappings</button>
+        </div>
+
+        <textarea v-model="mappingsJson" rows="10" class="form-textarea mt-4 p-4 w-full rounded shadow-md" placeholder="JSON Output"></textarea>
+    </div>
+
+    <!-- Add Bootstrap JS (optional) -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                newMapping: {
+                    column: "",
+                    desired_column: "",
+                    action: "no_action",
+                    required: false,
+                    value_mapping: [],
+                    fallback_value: "",
+                    substring_mapping: [],
+                    concatenate_order: [],
+                },
+                dataMappings: [
+                    {
+                        "column":"Action",
+                        "desired_column":"online-banking",
+                        "action":"value_mapping",
+                        "required":true,
+                        "value_mapping":[
+                            {
+                                "value":"LOGIN",
+                                "replacement":"True"
+                            }
+                        ],
+                        "fallback_value":"False",
+                        "substring_mapping":[
+                            
+                        ],
+                        "concatenate_order":[
+                            
+                        ]
+                    },
+                    {
+                        "column":"MemberNumber",
+                        "desired_column":"unique_id",
+                        "action":"no_action",
+                        "required":true,
+                        "value_mapping":[
+                            
+                        ],
+                        "fallback_value":"",
+                        "substring_mapping":[
+                            
+                        ],
+                        "concatenate_order":[
+                            
+                        ]
+                    },
+                    {
+                        "column":"ReplaceMe",
+                        "desired_column":"replace_account_number",
+                        "action":"replace_characters",
+                        "required":false,
+                        "value_mapping":[
+                            
+                        ],
+                        "fallback_value":"",
+                        "substring_mapping":[
+                            {
+                                "substring":"P",
+                                "replacement":""
+                            }
+                        ],
+                        "concatenate_order":[
+                            
+                        ]
+                    },
+                    {
+                        "column":"Account",
+                        "desired_column":"account_number",
+                        "action":"concatenate_columns",
+                        "required":false,
+                        "value_mapping":[
+                            
+                        ],
+                        "fallback_value":"",
+                        "substring_mapping":[
+                            
+                        ],
+                        "concatenate_order":[
+                            {
+                                "type":"column",
+                                "columnOrString":"Account"
+                            },
+                            {
+                                "type":"column",
+                                "columnOrString":"Suffix"
+                            },
+                            {
+                                "type":"string",
+                                "columnOrString":"L"
+                            }
+                        ]
+                    }
+                ],
+                editingIndex: -1,
+                mappingsJson: "", // To store JSON output
+            },
+            methods: {
+                addMapping() {
+                    if (
+                        this.newMapping.column &&
+                        this.newMapping.desired_column
+                    ) {
+                        if (this.editingIndex === -1) {
+                            this.dataMappings.push({ ...this.newMapping });
+                        } else {
+                            this.dataMappings[this.editingIndex] = { ...this.newMapping };
+                            this.editingIndex = -1; // Reset editingIndex
+                        }
+                        this.newMapping = {
+                            column: "",
+                            desired_column: "",
+                            action: "no_action",
+                            required: false,
+                            value_mapping: [],
+                            fallback_value: "",
+                            substring_mapping: [],
+                            concatenate_order: [],
+                        };
+                    }
+                    console.log(this.dataMappings);
+                },
+                removeMapping(index) {
+                    this.dataMappings.splice(index, 1);
+                },
+                editMapping(index) {
+                    this.newMapping = { ...this.dataMappings[index] };
+                    this.editingIndex = index;
+                },
+                cancelEdit() {
+                    this.newMapping = {
+                        column: "",
+                        desired_column: "",
+                        action: "no_action",
+                        required: false,
+                        value_mapping: [],
+                        fallback_value: "",
+                        substring_mapping: [],
+                        concatenate_order: [],
+                    };
+                    this.editingIndex = -1;
+                },
+                addValueMapping() {
+                    this.newMapping.value_mapping.push({ value: "", replacement: "" });
+                },
+                removeValueMapping(index) {
+                    this.newMapping.value_mapping.splice(index, 1);
+                },
+                addSubstringMapping() {
+                    this.newMapping.substring_mapping.push({ substring: "", replacement: "" });
+                },
+                removeSubstringMapping(index) {
+                    this.newMapping.substring_mapping.splice(index, 1);
+                },
+                addConcatenateOrder() {
+                    this.newMapping.concatenate_order.push({ type: "column", columnOrString: "" });
+                },
+                removeConcatenateOrder(index) {
+                    this.newMapping.concatenate_order.splice(index, 1);
+                },
+                mappingDetails(mapping) {
+                    switch (mapping.action) {
+                        case "value_mapping":
+                            return "Value Mapping Details";
+                        case "replace_characters":
+                            return "Replace Characters Details";
+                        case "concatenate_columns":
+                            return "Concatenate Columns Details";
+                        default:
+                            return "No Action";
+                    }
+                },
+                saveMappings() {
+                    this.mappingsJson = JSON.stringify(this.dataMappings, null, 4);
+                },
+            },
+        });
+
+    </script>
+</body>
+</html>

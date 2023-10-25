@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Checklist</title>
+    <!-- Include Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div id="app" class="container mx-auto p-4">
+
+        <div class="bg-white p-4 shadow rounded">
+            <!-- Create New Project Section -->
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold">Create New Project</h2>
+                <input v-model="newProjectName" type="text" placeholder="Project Name" class="w-full px-2 py-1 rounded mt-2">
+                <div class="mt-2">
+                    <span class="mr-2">Tags:</span>
+                    <label v-for="tag in availableTags" :key="tag.name" class="mr-2">
+                        <input type="checkbox" v-model="selectedTags" :value="tag">{{ tag.name }}
+                    </label>
+                </div>
+                <button @click="createProject" class="px-4 py-2 bg-blue-500 text-white rounded mt-2 hover:bg-blue-600">Create Project</button>
+            </div>
+        </div>
+    
+
+        <div class="bg-white p-4 shadow rounded mt-4">
+            <!-- Project List -->
+            <div>
+                <h2 class="text-lg font-semibold">Projects</h2>
+                <ul class="list-disc ml-4">
+                    <li v-for="project in projects" :key="project.id" class="mb-2">
+                        <span>{{ project.name }}</span>
+                        <button @click="selectProject(project)" class="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Select</button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tags and Tasks for the Selected Project -->
+            <div v-if="selectedProject">
+                <h2 class="text-lg font-semibold mt-4">Tags for {{ selectedProject.name }}</h2>
+                <ul class="list-disc ml-4">
+                    <li v-for="tag in selectedProject.tags" :key="tag.id" class="mb-2">
+                        <span :class="{ 'line-through': tag.completed }">{{ tag.name }}</span>
+                        <ul class="list-none ml-4">
+                            <li v-for="task in tag.tasks" :key="task.id" class="mb-1">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" v-model="task.completed" :value="{'checked': task.completed}" @change="toggleTaskStatus(tag, task)" class="mr-2">
+                                    <span :class="{ 'line-through': task.completed }">{{ task.name }}</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script>
+const app = new Vue({
+    el: '#app',
+    data: {
+        projects: [
+            // Existing projects
+        ],
+        selectedProject: {
+      "id":1694013887063,
+      "name":"Test Project",
+      "status":false,
+      "tags":[
+         {
+            "name":"Custom Domain",
+            "completed":false,
+            "tasks":[
+               {
+                  "name":"Tap Jesse to add custom domain to AWS and generate records",
+                  "completed":false
+               },
+               {
+                  "name":"Jesse provides 2 records (CNAME and Auth)",
+                  "completed":false
+               },
+               {
+                  "name":"Ticket updated with records",
+                  "completed":false
+               },
+               {
+                  "name":"FI enters records",
+                  "completed":false
+               },
+               {
+                  "name":"Once records confirmed propagated, accessing the custom domain returns 403",
+                  "completed":false
+               },
+               {
+                  "name":"Jesse confirms SSL certificate generated",
+                  "completed":false
+               },
+               {
+                  "name":"Custom domain applied in SuperAdmin",
+                  "completed":false
+               }
+            ]
+         },
+         {
+            "name":"Custom Short Domain",
+            "completed":false,
+            "tasks":[
+               {
+                  "name":"Tap Jesse to add to Heroku",
+                  "completed":false
+               },
+               {
+                  "name":"Jesse returns a CNAME record for the custom domain",
+                  "completed":false
+               },
+               {
+                  "name":"Ticket is updated with the record",
+                  "completed":false
+               },
+               {
+                  "name":"FI enters the record and it propagates",
+                  "completed":false
+               },
+               {
+                  "name":"We confirm propagation",
+                  "completed":false
+               },
+               {
+                  "name":"Custom short domain applied in SuperAdmin",
+                  "completed":false
+               }
+            ]
+         },
+         {
+            "name":"SMTP Email",
+            "completed":false,
+            "tasks":[
+               {
+                  "name":"Ensure FI is aware of the issues around spam reports and server load when we send via their domain",
+                  "completed":false
+               },
+               {
+                  "name":"Ensure FI is aware we cannot collect bounce or failure statistics via SMTP",
+                  "completed":false
+               },
+               {
+                  "name":"Confirm SMTP credentials",
+                  "completed":false
+               },
+               {
+                  "name":"Apply SMTP credentials via SuperAdmin",
+                  "completed":false
+               },
+               {
+                  "name":"Confirm can send email",
+                  "completed":false
+               },
+               {
+                  "name":"Update ticket noting that email setup is complete",
+                  "completed":false
+               }
+            ]
+         }
+      ]
+   },
+        newProjectName: '',
+        availableTags: [
+            {
+                name:'Custom Domain',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Tap Jesse to add custom domain to AWS and generate records',
+                        completed:false,
+                    },
+                    {
+                        name:'Jesse provides 2 records (CNAME and Auth)',
+                        completed:false,
+                    },
+                    {
+                        name:'Ticket updated with records',
+                        completed:false,
+                    },
+                    {
+                        name:'FI enters records',
+                        completed:false,
+                    },
+                    {
+                        name:'Once records confirmed propagated, accessing the custom domain returns 403',
+                        completed:false,
+                    },
+                    {
+                        name:'Jesse confirms SSL certificate generated',
+                        completed:false,
+                    },
+                    {
+                        name:'Custom domain applied in SuperAdmin',
+                        completed:false,
+                    },
+                ]
+            },
+            {
+                name:'Custom Short Domain',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Tap Jesse to add to Heroku',
+                        completed:false
+                    },
+                    {
+                        name:'Jesse returns a CNAME record for the custom domain',
+                        completed:false
+                    },
+                    {
+                        name:'Ticket is updated with the record',
+                        completed:false
+                    },
+                    {
+                        name:'FI enters the record and it propagates',
+                        completed:false
+                    },
+                    {
+                        name:'We confirm propagation',
+                        completed:false
+                    },
+                    {
+                        name:'Custom short domain applied in SuperAdmin',
+                        completed:false
+                    },
+                ]
+            },
+            {
+                name:'DNS Email',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Apply email domain in SuperAdmin',
+                        completed:false
+                    },
+                    {
+                        name:'Ticket is updated with SPF and DKIM records',
+                        completed:false
+                    },
+                    {
+                        name:'FI enters the records and they propagate',
+                        completed:false
+                    },
+                    {
+                        name:'Check SuperAdmin for record propagation and validity',
+                        completed:false
+                    },
+                    {
+                        name:'If correct, attempt email send.',
+                        completed:false
+                    },
+                    {
+                        name:'If successful, update the ticket to note Email setup is complete',
+                        completed:false
+                    },
+                ]
+            },
+            {
+                name:'SMTP Email',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Ensure FI is aware of the issues around spam reports and server load when we send via their domain',
+                        completed:false,
+                    },
+                    {
+                        name:'Ensure FI is aware we cannot collect bounce or failure statistics via SMTP',
+                        completed:false,
+                    },
+                    {
+                        name:'Confirm SMTP credentials',
+                        completed:false,
+                    },
+                    {
+                        name:'Apply SMTP credentials via SuperAdmin',
+                        completed:false,
+                    },
+                    {
+                        name:'Confirm can send email',
+                        completed:false,
+                    },
+                    {
+                        name:'Update ticket noting that email setup is complete',
+                        completed:false,
+                    },
+                ]
+            },
+            {
+                name:'IP Whitelisting',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Confirm IP addresses',
+                        completed:false,
+                    },
+                    {
+                        name:'Apply in General settings',
+                        completed:false,
+                    },
+                    {
+                        name:'Note that DO employees will still be able to access their team site',
+                        completed:false,
+                    },
+                ]
+            },
+            {
+                name:'Symitar',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Provide PowerOns',
+                        completed:false,
+                    },
+                    {
+                        name:'FI/MDT installs and configures',
+                        completed:false,
+                    },
+                    {
+                        name:'Mappings applied',
+                        completed:false,
+                    },
+                    {
+                        name:'FI/MDT creates extracts and confirms they are valid',
+                        completed:false,
+                    },
+                    {
+                        name:'FI/MDT uploads extracts to site',
+                        completed:false,
+                    },
+                    {
+                        name:'FI tests extracts via Targeting',
+                        completed:false,
+                    },
+                ]
+            },
+            {
+                name:'Card on File',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Confirm top 9',
+                        completed:false,
+                    },
+                    {
+                        name:'Confirm BINs',
+                        completed:false,
+                    },
+                    {
+                        name:'Add FI to Strivve Dashboard',
+                        completed:false,
+                    },
+                    {
+                        name:'Enter BINs',
+                        completed:false,
+                    },
+                    {
+                        name:'Enable CoF and apply lookup key in SuperAdmin',
+                        completed:false,
+                    },
+                    {
+                        name:'Go into site and confirm CoF widget loads',
+                        completed:false,
+                    },
+                    {
+                        name:'Notify on the ticket that CoF is available',
+                        completed:false,
+                    },
+                ]
+            },
+            {
+                name:'FLEX',
+                completed:false,
+                tasks:[
+                    
+                ]
+            },
+            {
+                name:'Direct Deposit',
+                completed:false,
+                tasks:[
+                    {
+                        name:'Request new instance via Atomic Slack channel',
+                        completed:false,
+                    },
+                    {
+                        name:'Provide Employer list, logo, and the FI\'s direct deposit link/company',
+                        completed:false,
+                    },
+                    {
+                        name:'Atomic creates instance',
+                        completed:false,
+                    },
+                    {
+                        name:'Access new instance in Atomic Dashboard',
+                        completed:false,
+                    },
+                    {
+                        name:'Get API Credentials and apply in SuperAdmin',
+                        completed:false,
+                    },
+                    {
+                        name:'In Settings > Features, enable Fractional Deposits.',
+                        completed:false,
+                    },
+                    {
+                        name:'In Settings > Webhook, add endpoint to "https://api.digitalonboarding.com/v1/widgets/direct-deposit/notification"',
+                        completed:false,
+                    },
+                    {
+                        name:'Notify on the ticket that DD is avalable',
+                        completed:false,
+                    },
+                ]
+            },
+        ],
+        selectedTags: []
+    },
+    methods: {
+        toggleProjectStatus(project) {
+            project.status = !project.status;
+        },
+        addTask(tag) {
+            const taskName = prompt('Enter task name:');
+            if (taskName) {
+                tag.tasks.push({ id: Date.now(), name: taskName, completed: false });
+            }
+        },
+        createProject() {
+            if (this.newProjectName.trim() === '') {
+                alert('Please enter a project name.');
+                return;
+            }
+
+            const newProject = {
+                id: Date.now(),
+                name: this.newProjectName,
+                status: false,
+                tags: []
+            };
+                
+            
+            newProject.tags = this.selectedTags;
+
+            this.projects.push(newProject);
+
+            // Reset input fields
+            this.newProjectName = '';
+            this.selectedTags = [];
+            console.log(JSON.stringify(this.projects));
+        },
+        toggleTaskStatus(tag, task) {
+            task.completed = !task.completed;
+            this.checkTagCompletion(tag);
+        },
+        checkTagCompletion(tag) {
+            const completedTasks = tag.tasks.filter(task => task.completed);
+            tag.completed = completedTasks.length === tag.tasks.length;
+        },
+        // select project
+        selectProject(project){
+            this.selectedProject = project
+        }
+    }
+});
+
+    </script>
+</body>
+</html>
